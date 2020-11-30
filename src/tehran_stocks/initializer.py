@@ -16,7 +16,7 @@ def init_db():
 
 
 def fill_db():
-    print("downloding  stock name and details from tccim")
+    print("downloading stock name and details from tsetmc")
     print("may take few minutes ")
     fill_stock_table()
     print("Stock table is available now, example:")

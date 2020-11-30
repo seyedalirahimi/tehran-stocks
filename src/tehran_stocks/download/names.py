@@ -14,7 +14,7 @@ def get_stock_ids():
 
 def get_stock_groups():
     """
-    group numbers from tccim, to avoid searching useless group numbers.
+    group numbers from tsetmc, to avoid searching useless group numbers.
     its a helper for other parts of package to collect stock lists.
     """
     r = requests.get("http://www.tsetmc.com/Loader.aspx?ParTree=111C1213")
@@ -38,7 +38,7 @@ def get_stock_detail(stock_id: str) -> "stock":
         int: number that represent group of stock
 
     """
-    
+
     url = "http://www.tsetmc.com/Loader.aspx?ParTree=151311&i={}".format(stock_id)
     r = requests.get(url)
     stock = {"code": stock_id}
@@ -77,7 +77,7 @@ def get_stock_detail(stock_id: str) -> "stock":
     stock["group_code"] = re.findall(r"CSecVal='([\w\d]*)|$',", r.text)[0]
     if stock["name"] == "',DEven='',LSecVal='',CgrValCot='',Flow='',InstrumentID='":
         return False
-    
+
     exist = Stocks.query.filter_by(code=stock_id).first()
     if exist:
         exist.shareCount=stock["shareCount"]
@@ -86,7 +86,7 @@ def get_stock_detail(stock_id: str) -> "stock":
         exist.estimatedEps=stock["estimatedEps"]
     else:
         db.session.add(Stocks(**stock))
-        
+
     try:
         db.session.commit()
     except:
@@ -107,11 +107,13 @@ def fill_stock_table():
     print("Downloading group ids...")
     stocks = get_stock_ids()
     for i,stock in enumerate(stocks):
-        get_stock_detail(stock)
-        print(
-            f"downloading stocks details, changes: {(i+1)/len(stocks)*100:.1f}% completed",
-            end="\r",
-            )
+        out = get_stock_detail(stock)
+        if not out :
+            print(stock)
+        # print(
+        #     f"downloading stocks details, changes: {(i+1)/len(stocks)*100:.1f}% completed",
+        #     end="\r",
+        #     )
 
     print("Add all groups, you can download stock price by following codes")
     print("from tehran_stocks import downloader")

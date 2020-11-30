@@ -25,7 +25,7 @@ def update_stock_price(code: str):
 
     params:
     ----------------
-    code: str or intege
+    code: str or integer
 
     example
     ----------------
@@ -39,27 +39,25 @@ def update_stock_price(code: str):
     try:
         q = f"select dtyyyymmdd as date from stock_price where code = {code}"
         temp = pd.read_sql(q, db.engine)
-        
+
         now = datetime.now().strftime("%Y%m%d")
 
-        qMaxDate=f"select max(dtyyyymmdd) as date from stock_price where code = {code}"
+        qMaxDate = f"select max(dtyyyymmdd) as date from stock_price where code = {code}"
         maxdate = pd.read_sql(qMaxDate, db.engine)
-        lastDate=(maxdate.date.iat[0])
+        lastDate = (maxdate.date.iat[0])
         try:
-            if lastDate is None:#no any record added in database
+            if lastDate is None:  # no any record added in database
                 url = f"http://www.tsetmc.com/tse/data/Export-txt.aspx?a=InsTrade&InsCode={code}&DateFrom=20000101&DateTo={now}&b=0"
-            elif (str(lastDate)<now):   #need to updata new price data
+            elif str(lastDate) < now:  # need to updata new price data
                 url = f"http://www.tsetmc.com/tse/data/Export-txt.aspx?a=InsTrade&InsCode={code}&DateFrom={str(lastDate)}&DateTo={now}&b=0"
-            else:                #The price data for this code is updateed
+            else:  # The price data for this code is updated
                 return
         except Exception as e:
-            print('Error on formating price:'+ str(e))
-        
+            print('Error on formatting price:' + str(e))
         df = pd.read_csv(url)
         df.columns = [i[1:-1].lower() for i in df.columns]
         df["code"] = code
         df["date_shamsi"] = ""
-
 
         # for index, row in df.iterrows():
         #     str_date = str(df.at[index, "dtyyyymmdd"])
@@ -90,16 +88,17 @@ def update_group(code):
         return
     for i, stock in enumerate(stocks):
         update_stock_price(stock[0])
-        print(f"group progress: {100*(i+1)/len(stocks):.1f}%", end="\r")
+        print(f"group progress: {100 * (i + 1) / len(stocks):.1f}%", end="\r")
 
 
 def get_all_price():
     codes = db.session.query(db.distinct(Stocks.group_code)).all()
     for i, code in enumerate(codes):
         print(
-            f"                         total progress: {100*(i+1)/len(codes):.2f}%",
+            f"                         total progress: {100 * (i + 1) / len(codes):.2f}%",
             end="\r",
         )
         update_group(code[0])
 
     print("Download Finished.")
+
