@@ -8,9 +8,8 @@ class Stocks(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    title = Column(String)
     group_name = Column(String)
-    group_code = Column(Integer)
+    group_code = Column(String)
     instId = Column(String)
     insCode = Column(String)
     code = Column(String, unique=True)
@@ -22,12 +21,12 @@ class Stocks(Base):
     _cached = False
     _dfcounter = 0
 
-    def __init__ (self, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-    
+
     @property
     def df(self):
-        self._dfcounter+=1
+        self._dfcounter += 1
         if self._cached:
             return self._df
         query = f"select * from stock_price where code = {self.code}"
@@ -39,15 +38,16 @@ class Stocks(Base):
         df["date"] = pd.to_datetime(df["dtyyyymmdd"], format="%Y%m%d")
         df = df.sort_values("date")
         df.reset_index(drop=True, inplace=True)
-        df.set_index("date",inplace=True)
+        df.set_index("date", inplace=True)
         self._cached = True
         self._df = df
         return self._df
 
     @property
     def mpl(self):
-        self._mpl = self.df.rename(columns={"close":"Close","open":"Open","high":"High","low":"Low","vol":"Volume"})
-        return self._mpl 
+        self._mpl = self.df.rename(
+            columns={"close": "Close", "open": "Open", "high": "High", "low": "Low", "vol": "Volume"})
+        return self._mpl
 
     def update(self):
         from tehran_stocks.download import update_stock_price
@@ -68,7 +68,7 @@ class Stocks(Base):
         print(f"Total days: {len(df)}")
 
     def __repr__(self):
-        return f"{self.title}-{self.name}-{self.group_name}"
+        return f"{self.name}-{self.group_name}"
 
     def __str__(self):
         return self.name
@@ -77,8 +77,8 @@ class Stocks(Base):
     def get_group():
         codes = (
             session.query(Stocks.group_code, Stocks.group_name)
-            .group_by(Stocks.group_code)
-            .all()
+                .group_by(Stocks.group_code)
+                .all()
         )
         return codes
 
@@ -87,9 +87,9 @@ class StockPrice(Base):
     __tablename__ = "stock_price"
 
     id = Column(Integer, primary_key=True)
-    code = Column(String, ForeignKey("stocks.code"),index=True)
+    code = Column(String, ForeignKey("stocks.code"), index=True)
     ticker = Column(String)
-    date = Column("dtyyyymmdd", Integer,index=True)
+    date = Column("dtyyyymmdd", Integer, index=True)
     date_shamsi = Column(String)
     first = Column(Float)
     high = Column(Float)
@@ -105,7 +105,7 @@ class StockPrice(Base):
     def __repr__(self):
         return f"{self.stock.name}, {self.date}, {self.close:.0f}"
 
+
 def get_asset(name):
     asset = Stocks.query.filter_by(name=name).first()
     return asset
-

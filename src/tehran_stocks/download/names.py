@@ -56,11 +56,7 @@ def get_stock_detail(stock_id: str) -> "stock":
     except:
         return
     try:
-        stock["title"] = re.findall(r"Title='([\D]*)',", r.text)[0]
-    except:
-        return
-    try:
-        stock["sectorPe"] = float(re.findall(r"SectorPE='([\.\d]*)',", r.text)[0])
+        stock["sectorPe"] = float(re.findall(r"SectorPE='([\.\d]*)", r.text)[0])
     except:
         stock["sectorPe"] = None
     try:
@@ -107,13 +103,11 @@ def fill_stock_table():
     print("Downloading group ids...")
     stocks = get_stock_ids()
     for i,stock in enumerate(stocks):
-        out = get_stock_detail(stock)
-        if not out :
-            print(stock)
-        # print(
-        #     f"downloading stocks details, changes: {(i+1)/len(stocks)*100:.1f}% completed",
-        #     end="\r",
-        #     )
+        get_stock_detail(stock)
+        print(
+            f"downloading stocks details, changes: {(i+1)/len(stocks)*100:.1f}% completed",
+            end="\r",
+            )
 
     print("Add all groups, you can download stock price by following codes")
     print("from tehran_stocks import downloader")
