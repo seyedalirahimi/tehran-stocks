@@ -92,11 +92,12 @@ def update_group(code):
 
 
 def get_all_price():
+    print("Download Starting.")
     codes = db.session.query(db.distinct(Stocks.group_code)).all()
     for i, code in enumerate(codes):
         print(
-            f"                         total progress: {100 * (i + 1) / len(codes):.2f}%",
-            end="\r",
+            f"total progress: {100 * (i + 1) / len(codes):.2f}%",
+
         )
         update_group(code[0])
 

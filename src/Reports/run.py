@@ -3,8 +3,6 @@ from Reports.histogram_value import histogram_value_grouped
 
 if __name__=="__main__":
 
-    # out = histogram_value(90)
-    # print(out)
-    out = histogram_value_grouped()
+    histogram_value(60)
+    histogram_value_grouped(60)
 
-    print(out)
