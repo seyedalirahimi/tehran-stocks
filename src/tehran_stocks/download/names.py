@@ -41,14 +41,11 @@ def get_stock_detail(stock_id: str) -> "stock":
 
     url = "http://www.tsetmc.com/Loader.aspx?ParTree=151311&i={}".format(stock_id)
     r = requests.get(url)
-    stock = {"code": stock_id}
-    stock["instId"] = re.findall(r"InstrumentID='([\w\d]*)|$',", r.text)[0]
-    stock["insCode"] = (
+    stock = {"code": stock_id, "instId": re.findall(r"InstrumentID='([\w\d]*)|$',", r.text)[0], "insCode": (
         stock_id if re.findall(r"InsCode='(\d*)',", r.text)[0] == stock_id else 0
-    )
-    stock["baseVol"] = float(re.findall(r"BaseVol=([\.\d]*),", r.text)[0])
+    ), "baseVol": float(re.findall(r"BaseVol=([\.\d]*),", r.text)[0])}
     try:
-        stock["name"] = re.findall(r"LVal18AFC='([\D]*)',", r.text)[0]
+        stock["name"] = re.findall(r"LVal18AFC='([\w]*)',", r.text)[0]
     except:
         return
     try:
